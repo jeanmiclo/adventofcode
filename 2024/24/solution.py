@@ -41,4 +41,25 @@ class Solution(SolutionBase):
         return res
 
     def part2(self, data):
-        return None
+
+        operations = []
+        op_per_var = defaultdict(set)
+
+        for line in data[92:]:
+            operations.append(line.rstrip('\n').split(' '))
+
+        for var1, op, var2, _, _ in operations:
+            op_per_var[var1].add(op)
+            op_per_var[var2].add(op)
+
+        wrong = set()
+        for var1, op, var2, _, res in operations:
+            if res.startswith("z") and op != "XOR":
+                wrong.add(res)
+            elif op == "XOR" and all(x[0] not in ("x", "y", "z") for x in (res[0], var1[0], var2[0])):
+                wrong.add(res)
+            elif op != "OR":
+                if (op == "AND") == ("OR" not in op_per_var[res]):
+                    wrong.add(res)
+
+        print(",".join(sorted(wrong - {next(out for var1, op, var2, _,out in operations if "x00" in (var1, var2)), "z45"})))
